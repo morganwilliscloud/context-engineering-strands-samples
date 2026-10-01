@@ -1,0 +1,3 @@
+strands-agents[web-fetch]==1.57.2
+strands-harness==0.1.2
+bedrock-agentcore==1.24.0

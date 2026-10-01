@@ -1,33 +1,32 @@
-"""
-Context Engineering Strategy: Select (Data)
-
-Give the agent tools to pull data from knowledge bases (RAG),
-APIs, and databases on demand. Each tool call brings focused,
-relevant tokens at the moment they're needed.
-
-Install:
-    pip install strands-agents strands-agents-tools
-"""
+"""Retrieve synthetic order data on demand. No database or external API is contacted."""
 
 from strands import Agent, tool
-from strands_tools import retrieve, http_request
+from strands.vended_tools import web_fetch
+
+from sample_support import make_model, run_turns
 
 
 @tool
-def query_db(sql: str) -> str:
-    """Run a read-only SQL query against the customer database.
+def lookup_order(order_id: str) -> str:
+    """Look up an order in a synthetic fixture.
 
     Args:
-        sql: A SELECT query to run against the customers database.
+        order_id: The fixture supports order 12345.
     """
-    # database lookup implementation
-    ...
+    if order_id != "12345":
+        return "Order not found in the demo fixture."
+    return "SYNTHETIC ORDER 12345: shipped, estimated arrival 2026-10-03, carrier Example Delivery."
 
 
-agent = Agent(
-    system_prompt="You are a support agent.",
-    tools=[retrieve, http_request, query_db],
-)
+def create_agent(model=None):
+    return Agent(
+        model=model if model is not None else make_model(),
+        context_manager="auto",
+        tools=[lookup_order, web_fetch],
+        system_prompt="Use tools to retrieve the requested information. Do not invent order details.",
+        callback_handler=None,
+    )
 
-# Relevant data pulled ON DEMAND
-agent("Where's my order #12345?")
+
+if __name__ == "__main__":
+    run_turns(create_agent(), ["Where is order 12345?"])
