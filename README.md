@@ -162,6 +162,41 @@ Omitting it starts a fresh conversation; local memory remains shared. Use a new
 `--state-dir ./rehearsal-2` when you need a completely clean rehearsal. This final example
 uses local Harness memory; sample 08 separately demonstrates AgentCore memory.
 
+## Override Harness defaults: personal assistant
+
+The closing slides show two separate configurations:
+
+- [10_harness_personal_assistant](10_harness_personal_assistant/main.py): direct OpenAI model, Mem0 long-term memory, and `context_manager="agentic"`.
+- [11_harness_custom_context](11_harness_custom_context/main.py): GPT-5.4 for the assistant, GPT-5 mini for summaries, a task-specific summary prompt, and explicit context thresholds.
+
+```bash
+pip install -e '.[personal]'
+# Configure OPENAI_API_KEY and, for sample 10, MEM0_API_KEY in your environment.
+python 10_harness_personal_assistant/main.py
+python 11_harness_custom_context/main.py
+```
+
+These examples call OpenAI directly; they do not require Bedrock access. Sample 10
+also sends conversation content to hosted Mem0 for extraction and uses `alex` as a
+synthetic user ID. Use the appropriate user scope in an actual application.
+
+Agentic mode supplies context usage information and the `summarize_context`,
+`truncate_context`, and `pin_context` tools. The agent decides what to retain or
+compress, with additional telemetry and tool-call overhead. Automatic truncation
+and overflow summarization remain safety nets. The custom pipeline in sample 11
+is an alternative to agentic mode: truncate tool results above 2,000 tokens, then
+summarize at 80% utilization while retaining six recent messages. Mem0 is omitted
+from that slide for clarity and can be supplied alongside a custom strategy.
+The context-manager strategy API remains experimental.
+
+The benchmark slide reports the published launch evaluation: 28% lower token cost
+using the same Claude or GPT models across six benchmarks, with nearly equal
+benchmark scores. Those results do not establish performance for these custom
+configurations. Source: [Strands Harness launch evaluation](https://strandsagents.com/blog/introducing-strands-harness/).
+
+Both configurations were constructed successfully with networking disabled and a
+mock Mem0 client. No paid OpenAI or Mem0 calls were run.
+
 ## Validation
 
 ```bash

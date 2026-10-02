@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 dynamic = ["dependencies"]
 
 [project.optional-dependencies]
+personal = ["strands-harness[openai]==0.1.2", "mem0-strands==0.1.1"]
 dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
 
 [tool.setuptools.dynamic]
